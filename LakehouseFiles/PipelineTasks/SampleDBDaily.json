@@ -1,0 +1,31 @@
+[
+    {
+        "source_query": "Products.sql",
+        "target_schema": "dw",
+        "target_table": "Product",
+        "notebook": ""
+    },
+    {
+        "source_query": "Customers.sql",
+        "target_schema": "dw",
+        "target_table": "Customer",
+        "notebook": ""
+    },
+    {
+        "source_query": "Date.sql",
+        "target_schema": "dw",
+        "target_table": "Date"
+    },
+    {
+        "source_query": "CurrentYearSales.sql",
+        "target_schema": "staging",
+        "target_table": "Sales",
+        "notebook": "MergeSales"
+    },
+    {
+        "source_query": "CurrentYearSalesDetails.sql",
+        "target_schema": "staging",
+        "target_table": "SalesDetail",
+        "notebook": "MergeSalesDetail"
+    }
+]

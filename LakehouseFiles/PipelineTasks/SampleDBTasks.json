@@ -1,0 +1,31 @@
+[
+    {
+        "source_query": "Products.sql",
+        "target_schema": "dw",
+        "target_table": "Product",
+        "notebook": ""
+    },
+    {
+        "source_query": "Customers.sql",
+        "target_schema": "dw",
+        "target_table": "Customer",
+        "notebook": ""
+    },
+    {
+        "source_query": "Date.sql",
+        "target_schema": "dw",
+        "target_table": "Date"
+    },
+    {
+        "source_query": "Sales.sql",
+        "target_schema": "dw",
+        "target_table": "Sales",
+        "notebook": ""
+    },
+    {
+        "source_query": "SalesDetails.sql",
+        "target_schema": "dw",
+        "target_table": "SalesDetail",
+        "notebook": ""
+    }
+]

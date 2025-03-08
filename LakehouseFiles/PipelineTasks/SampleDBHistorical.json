@@ -1,0 +1,14 @@
+[
+    {
+        "source_query": "PastYearsSales.sql",
+        "target_schema": "staging",
+        "target_table": "Sales",
+        "notebook": "MergeSales"
+    },
+    {
+        "source_query": "PastYearsSalesDetails.sql",
+        "target_schema": "staging",
+        "target_table": "SalesDetail",
+        "notebook": "MergeSalesDetail"
+    }
+]
