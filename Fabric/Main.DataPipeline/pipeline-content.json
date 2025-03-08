@@ -1,0 +1,32 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "InvokePipeline",
+        "typeProperties": {
+          "parameters": {
+            "TaskFolder": "PipelineTasks",
+            "TaskFile": "SampleDBDaily.json",
+            "SourceQueryFilter": "***ALL***"
+          },
+          "waitOnCompletion": true,
+          "workspaceId": "00000000-0000-0000-0000-000000000000",
+          "pipelineId": "1bb953e8-73f4-a780-4f0f-2f7297bc4544",
+          "operationType": "InvokeFabricPipeline"
+        },
+        "externalReferences": {
+          "connection": "8e2366ee-3f3f-4e36-a3b5-5877cd72b02d"
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "SampleDB Daily Tasks",
+        "dependsOn": []
+      }
+    ]
+  }
+}

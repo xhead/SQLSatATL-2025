@@ -1,0 +1,270 @@
+{
+  "properties": {
+    "activities": [
+      {
+        "type": "Lookup",
+        "typeProperties": {
+          "source": {
+            "type": "JsonSource",
+            "formatSettings": {
+              "type": "JsonReadSettings"
+            },
+            "storeSettings": {
+              "type": "LakehouseReadSettings",
+              "recursive": false,
+              "enablePartitionDiscovery": false
+            }
+          },
+          "datasetSettings": {
+            "type": "Json",
+            "typeProperties": {
+              "location": {
+                "type": "LakehouseLocation",
+                "folderPath": {
+                  "value": "@pipeline().parameters.TaskFolder",
+                  "type": "Expression"
+                },
+                "fileName": {
+                  "value": "@pipeline().parameters.TaskFile",
+                  "type": "Expression"
+                }
+              }
+            },
+            "schema": {},
+            "linkedService": {
+              "name": "DemoLakehouse",
+              "properties": {
+                "type": "Lakehouse",
+                "typeProperties": {
+                  "artifactId": "df09fc00-1134-8253-4168-5d987a28a711",
+                  "workspaceId": "00000000-0000-0000-0000-000000000000",
+                  "rootFolder": "Files"
+                },
+                "annotations": []
+              }
+            },
+            "annotations": []
+          },
+          "firstRowOnly": false
+        },
+        "policy": {
+          "timeout": "0.12:00:00",
+          "retry": 0,
+          "retryIntervalInSeconds": 30,
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "GetTasks",
+        "dependsOn": []
+      },
+      {
+        "type": "SetVariable",
+        "typeProperties": {
+          "variableName": "Tasks",
+          "value": {
+            "value": "@activity('GetTasks').output.value",
+            "type": "Expression"
+          }
+        },
+        "policy": {
+          "secureInput": false,
+          "secureOutput": false
+        },
+        "name": "Set TaskList",
+        "dependsOn": [
+          {
+            "activity": "GetTasks",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      },
+      {
+        "type": "ForEach",
+        "typeProperties": {
+          "items": {
+            "value": "@variables('Tasks')",
+            "type": "Expression"
+          },
+          "activities": [
+            {
+              "type": "Copy",
+              "typeProperties": {
+                "source": {
+                  "type": "FabricSqlDatabaseSource",
+                  "sqlReaderQuery": {
+                    "value": "@activity('Get SQL').output.firstRow.prop_0",
+                    "type": "Expression"
+                  },
+                  "partitionOption": "None",
+                  "queryTimeout": "02:00:00",
+                  "datasetSettings": {
+                    "type": "FabricSqlDatabaseTable",
+                    "schema": [],
+                    "connectionSettings": {
+                      "name": "SampleDB",
+                      "properties": {
+                        "type": "FabricSqlDatabase",
+                        "typeProperties": {
+                          "artifactId": "eacc4554-5ff7-4d2c-95e9-479f02cd295e",
+                          "workspaceId": "18334567-bddc-46f6-853c-5b5e7e882405"
+                        },
+                        "externalReferences": {
+                          "connection": "567f75ac-401f-4c0e-bd9f-7b7a4a6b67ba"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "annotations": []
+                  }
+                },
+                "sink": {
+                  "type": "LakehouseTableSink",
+                  "tableActionOption": "OverwriteSchema",
+                  "partitionOption": "None",
+                  "datasetSettings": {
+                    "type": "LakehouseTable",
+                    "typeProperties": {
+                      "schema": {
+                        "value": "@item().target_schema",
+                        "type": "Expression"
+                      },
+                      "table": {
+                        "value": "@item().target_table",
+                        "type": "Expression"
+                      }
+                    },
+                    "schema": [],
+                    "linkedService": {
+                      "name": "DemoLakehouse",
+                      "properties": {
+                        "type": "Lakehouse",
+                        "typeProperties": {
+                          "artifactId": "df09fc00-1134-8253-4168-5d987a28a711",
+                          "workspaceId": "00000000-0000-0000-0000-000000000000",
+                          "rootFolder": "Tables"
+                        },
+                        "annotations": []
+                      }
+                    },
+                    "annotations": []
+                  }
+                },
+                "translator": {
+                  "type": "TabularTranslator",
+                  "typeConversion": true,
+                  "typeConversionSettings": {
+                    "allowDataTruncation": true,
+                    "treatBooleanAsNumber": false
+                  }
+                },
+                "enableStaging": false
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Copy from SampleDB",
+              "dependsOn": [
+                {
+                  "activity": "Get SQL",
+                  "dependencyConditions": [
+                    "Succeeded"
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "Lookup",
+              "typeProperties": {
+                "source": {
+                  "type": "DelimitedTextSource",
+                  "formatSettings": {
+                    "type": "DelimitedTextReadSettings"
+                  },
+                  "storeSettings": {
+                    "type": "LakehouseReadSettings",
+                    "recursive": true,
+                    "enablePartitionDiscovery": false
+                  }
+                },
+                "datasetSettings": {
+                  "type": "DelimitedText",
+                  "typeProperties": {
+                    "location": {
+                      "type": "LakehouseLocation",
+                      "folderPath": {
+                        "value": "@pipeline().parameters.TaskFolder",
+                        "type": "Expression"
+                      },
+                      "fileName": {
+                        "value": "@item().source_query",
+                        "type": "Expression"
+                      }
+                    },
+                    "columnDelimiter": "#$#$#$#$#$#$",
+                    "rowDelimiter": "#%#%#%#%#%#%",
+                    "quoteChar": "\"",
+                    "escapeChar": "\\",
+                    "firstRowAsHeader": false
+                  },
+                  "schema": [],
+                  "linkedService": {
+                    "name": "DemoLakehouse",
+                    "properties": {
+                      "type": "Lakehouse",
+                      "typeProperties": {
+                        "artifactId": "df09fc00-1134-8253-4168-5d987a28a711",
+                        "workspaceId": "00000000-0000-0000-0000-000000000000",
+                        "rootFolder": "Files"
+                      },
+                      "annotations": []
+                    }
+                  },
+                  "annotations": []
+                }
+              },
+              "policy": {
+                "timeout": "0.12:00:00",
+                "retry": 0,
+                "retryIntervalInSeconds": 30,
+                "secureInput": false,
+                "secureOutput": false
+              },
+              "name": "Get SQL",
+              "dependsOn": []
+            }
+          ]
+        },
+        "name": "ForEach Task",
+        "dependsOn": [
+          {
+            "activity": "Set TaskList",
+            "dependencyConditions": [
+              "Succeeded"
+            ]
+          }
+        ]
+      }
+    ],
+    "parameters": {
+      "TaskFolder": {
+        "type": "string",
+        "defaultValue": "PipelineTasks"
+      },
+      "TaskFile": {
+        "type": "string",
+        "defaultValue": "SampleDBTasks.json"
+      }
+    },
+    "variables": {
+      "Tasks": {
+        "type": "Array"
+      }
+    }
+  }
+}
